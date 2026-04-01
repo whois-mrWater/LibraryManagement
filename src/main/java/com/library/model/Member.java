@@ -1,0 +1,65 @@
+package com.library.model;
+
+import jakarta.persistence.*;
+import java.time.LocalDate;
+
+/**
+ * PERSON 4 - User Management & Authentication
+ * 👤 Model đại diện cho 1 thành viên thư viện
+ * 
+ * Chức năng:
+ * - Quản lý người dùng (Add/Remove member)
+ * - Login bằng SĐT
+ * - Phân quyền (Admin/User)
+ */
+@Entity
+@Table(name = "members")
+public class Member {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true, length = 10)
+    private String memberCode;    // Mã thành viên (M001, M002, ...)
+    
+    @Column(nullable = false)
+    private String fullName;      // Họ tên đầy đủ
+    
+    @Column(nullable = false, unique = true, length = 11)
+    private String phone;         // Số điện thoại (login key)
+    
+    @Column(unique = true)
+    private String email;         // Email
+    
+    private LocalDate joinDate;   // Ngày đăng ký
+    
+    @Column(columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private boolean active;       // Tài khoản còn hoạt động?
+
+    // Role không bắt buộc, có thể mở rộng sau
+    // @Column(nullable = false)
+    // private String role;       // ADMIN, LIBRARIAN, MEMBER
+
+    // ===== Getter & Setter =====
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getMemberCode() { return memberCode; }
+    public void setMemberCode(String memberCode) { this.memberCode = memberCode; }
+
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public LocalDate getJoinDate() { return joinDate; }
+    public void setJoinDate(LocalDate joinDate) { this.joinDate = joinDate; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+}

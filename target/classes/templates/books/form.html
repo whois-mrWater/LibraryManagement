@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Form Sach</title></head>
+<body>
+    <h1>📖 Them / Sua Sach</h1>
+    <form th:action="@{/books/add}" method="post" th:object="${book}">
+        <table>
+            <tr><td>Ten Sach:</td><td><input type="text" th:field="*{title}" id="title"/></td></tr>
+            <tr><td>Tac Gia:</td><td><input type="text" th:field="*{author}" id="author"/></td></tr>
+            <tr><td>ISBN:</td><td><input type="text" th:field="*{isbn}" id="isbn"/></td></tr>
+            <tr><td>The Loai:</td><td><input type="text" th:field="*{category}" id="category"/></td></tr>
+            <tr><td>Tong So Ban:</td><td><input type="number" th:field="*{totalCopies}" id="totalCopies"/></td></tr>
+            <tr><td>So Ban Hien Co:</td><td><input type="number" th:field="*{availableCopies}" id="availableCopies"/></td></tr>
+        </table>
+        <br/>
+        <button type="submit" id="submitBtn">Luu</button>
+        <a href="/books">Huy</a>
+    </form>
+</body>
+</html>

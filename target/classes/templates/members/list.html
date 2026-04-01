@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Danh Sach Thanh Vien</title></head>
+<body>
+    <h1>👥 Quan Ly Thanh Vien</h1>
+    <a href="/members/register">+ Dang Ky Thanh Vien Moi</a> | <a href="/">← Trang Chu</a>
+    <table border="1" cellpadding="8" style="margin-top:20px; border-collapse:collapse;">
+        <tr><th>Ma The</th><th>Ho Ten</th><th>Email</th><th>SDT</th><th>Trang Thai</th></tr>
+        <tr th:each="m : ${members}">
+            <td th:text="${m.memberCode}"></td>
+            <td th:text="${m.fullName}"></td>
+            <td th:text="${m.email}"></td>
+            <td th:text="${m.phone}"></td>
+            <td th:text="${m.active ? 'Hoat dong' : 'Da khoa'}"></td>
+        </tr>
+    </table>
+</body>
+</html>
