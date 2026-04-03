@@ -1,20 +1,61 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><title>Form Sach</title></head>
+<head><meta charset="UTF-8"><title>Form Sách</title></head>
 <body>
-    <h1>📖 Them / Sua Sach</h1>
-    <form th:action="@{/books/add}" method="post" th:object="${book}">
+    <!-- Tiêu đề thay đổi theo ngữ cảnh: thêm mới hay sửa -->
+    <h1 th:text="${book.id == null} ? '📖 Thêm Sách Mới' : '✏️ Chỉnh Sửa Sách'"></h1>
+
+    <!-- Thông báo lỗi -->
+    <div th:if="${errorMessage}" style="color:red; padding:8px; border:1px solid red;">
+        ⚠️ <span th:text="${errorMessage}"></span>
+    </div>
+
+    <!--
+        th:action động:
+        - Nếu book.id == null  → đang THÊM MỚI → gửi lên /books/new
+        - Nếu book.id có giá trị → đang SỬA    → gửi lên /books/edit/{id}
+    -->
+    <form th:action="${book.id == null} ? @{/books/new} : @{/books/edit/{id}(id=${book.id})}"
+          method="post"
+          th:object="${book}">
+
         <table>
-            <tr><td>Ten Sach:</td><td><input type="text" th:field="*{title}" id="title"/></td></tr>
-            <tr><td>Tac Gia:</td><td><input type="text" th:field="*{author}" id="author"/></td></tr>
-            <tr><td>ISBN:</td><td><input type="text" th:field="*{isbn}" id="isbn"/></td></tr>
-            <tr><td>The Loai:</td><td><input type="text" th:field="*{category}" id="category"/></td></tr>
-            <tr><td>Tong So Ban:</td><td><input type="number" th:field="*{totalCopies}" id="totalCopies"/></td></tr>
-            <tr><td>So Ban Hien Co:</td><td><input type="number" th:field="*{availableCopies}" id="availableCopies"/></td></tr>
+            <tr>
+                <td>Mã Sách:</td>
+                <td><input type="text" th:field="*{bookCode}" placeholder="VD: BK011"/></td>
+            </tr>
+            <tr>
+                <td>Tên Sách:</td>
+                <td><input type="text" th:field="*{title}" placeholder="VD: Dế Mèn Phiêu Lưu Ký"/></td>
+            </tr>
+            <tr>
+                <td>Tác Giả:</td>
+                <td><input type="text" th:field="*{author}" placeholder="VD: Tô Hoài"/></td>
+            </tr>
+            <tr>
+                <td>Nhà Xuất Bản:</td>
+                <td><input type="text" th:field="*{publisher}" placeholder="VD: Kim Đồng"/></td>
+            </tr>
+            <tr>
+                <td>Thể Loại:</td>
+                <td><input type="text" th:field="*{category}" placeholder="VD: Văn học trẻ em"/></td>
+            </tr>
+            <tr>
+                <td>Tổng Số Bản:</td>
+                <td><input type="number" th:field="*{totalCopies}" min="1"/></td>
+            </tr>
+            <tr>
+                <td>Số Bản Hiện Có:</td>
+                <td><input type="number" th:field="*{availableCopies}" min="0"/></td>
+            </tr>
         </table>
+
         <br/>
-        <button type="submit" id="submitBtn">Luu</button>
-        <a href="/books">Huy</a>
+        <!-- Nút Lưu cũng thay đổi label theo ngữ cảnh -->
+        <button type="submit" id="submitBtn"
+                th:text="${book.id == null} ? 'Thêm Sách' : 'Cập Nhật'">
+        </button>
+        <a th:href="@{/books}">Hủy</a>
     </form>
 </body>
 </html>

@@ -27,8 +27,8 @@ class LibraryE2ETest {
         playwright = Playwright.create();
         browser = playwright.chromium().launch(
             new BrowserType.LaunchOptions()
-                .setHeadless(false)   // false = hien thi trinh duyet (de quay video)
-                .setSlowMo(500)       // Chay cham 500ms moi buoc (de quay ro hon)
+                .setHeadless(false)
+                .setSlowMo(500)
         );
     }
 
@@ -40,14 +40,14 @@ class LibraryE2ETest {
     @BeforeEach
     void createContext() {
         context = browser.newContext(new Browser.NewContextOptions()
-            .setRecordVideoDir(java.nio.file.Paths.get("test-videos/")) // Tu dong quay video
+            .setRecordVideoDir(java.nio.file.Paths.get("test-videos/"))
         );
         page = context.newPage();
     }
 
     @AfterEach
     void closeContext() {
-        context.close(); // Video duoc luu sau khi context dong
+        context.close();
     }
 
     // ===== TEST 1: TRANG CHU =====
@@ -67,46 +67,90 @@ class LibraryE2ETest {
     @Order(2)
     @DisplayName("E2E_TC002 - Them sach moi qua giao dien web")
     void testAddBook_ViaUI_Success() {
-        page.navigate(BASE_URL + "/books/add");
+        page.navigate(BASE_URL + "/books/new");
 
-        // Dien form
+        page.fill("#bookCode", "BKTEST001");
         page.fill("#title", "Sach Test Playwright");
         page.fill("#author", "Tac Gia Test");
-        page.fill("#isbn", "111-222-333");
         page.fill("#category", "Test");
+        page.fill("#publisher", "Nha Xuat Ban Test");
         page.fill("#totalCopies", "3");
         page.fill("#availableCopies", "3");
 
-        // Click nut Luu
         page.click("#submitBtn");
 
-        // Kiem tra duoc chuyen ve trang danh sach
         page.waitForURL(BASE_URL + "/books");
         assertTrue(page.content().contains("Sach Test Playwright"));
         System.out.println("✅ E2E_TC002 PASSED");
     }
 
-    // ===== TEST 3: DANG KY THANH VIEN =====
+    // ===== TEST 3: SUA SACH (PERSON A) =====
     @Test
     @Order(3)
-    @DisplayName("E2E_TC003 - Dang ky thanh vien moi qua giao dien web")
-    void testRegisterMember_ViaUI_Success() {
-        page.navigate(BASE_URL + "/members/register");
+    @DisplayName("E2E_TC003 - Sua sach vua them qua giao dien web")
+    void testEditBook_ViaUI_Success() {
+        // Vao trang danh sach, tim dong chua "Sach Test Playwright"
+        page.navigate(BASE_URL + "/books");
 
-        page.fill("#fullName", "Nguyen Van Test");
-        page.fill("#email", "test@example.com");
-        page.fill("#phone", "0901234567");
+        // Click nut Sua cua dong chua "Sach Test Playwright"
+        page.locator("tr:has-text('Sach Test Playwright') a[href*='/books/edit/']").click();
+
+        // Kiem tra da vao dung trang sua
+        assertTrue(page.url().contains("/books/edit/"));
+
+        // Doi ten sach
+        page.fill("#title", "Sach Test Playwright DA SUA");
+        page.fill("#author", "Tac Gia Da Sua");
 
         page.click("#submitBtn");
 
-        page.waitForURL(BASE_URL + "/members");
-        assertTrue(page.content().contains("Nguyen Van Test"));
+        // Kiem tra duoc chuyen ve danh sach va hien ten moi
+        page.waitForURL(BASE_URL + "/books");
+        assertTrue(page.content().contains("Sach Test Playwright DA SUA"));
         System.out.println("✅ E2E_TC003 PASSED");
     }
 
+    // ===== TEST 4: XOA SACH (PERSON A) =====
+    @Test
+    @Order(4)
+    @DisplayName("E2E_TC004 - Xoa sach vua sua qua giao dien web")
+    void testDeleteBook_ViaUI_Success() {
+        page.navigate(BASE_URL + "/books");
+
+        // Click nut Xoa cua dong chua "Sach Test Playwright DA SUA"
+        page.locator("tr:has-text('Sach Test Playwright DA SUA') form[action*='/books/delete/'] button").click();
+
+        // Kiem tra van o trang danh sach
+        page.waitForURL(BASE_URL + "/books");
+
+        // Kiem tra sach da bi xoa khoi danh sach
+        assertFalse(page.content().contains("Sach Test Playwright DA SUA"));
+        System.out.println("✅ E2E_TC004 PASSED");
+    }
+
+    // ===== TEST 5: TIM KIEM SACH (PERSON A) =====
+    @Test
+    @Order(5)
+    @DisplayName("E2E_TC005 - Tim kiem sach theo tu khoa")
+    void testSearchBook_ViaUI_Success() {
+        page.navigate(BASE_URL + "/books");
+
+        // Nhap tu khoa tim kiem
+        page.fill("input[name='keyword']", "Nguyen Nhat Anh");
+        page.press("input[name='keyword']", "Enter");
+
+        // Kiem tra ket qua hien thi dung
+        assertTrue(page.content().contains("Nguyen Nhat Anh"));
+
+        // Kiem tra tu khoa van con trong o tim kiem
+        assertEquals("Nguyen Nhat Anh", page.inputValue("input[name='keyword']"));
+        System.out.println("✅ E2E_TC005 PASSED");
+    }
+
     // TODO: Them cac E2E test cho:
-    // - E2E_TC004: Muon sach
-    // - E2E_TC005: Tra sach
-    // - E2E_TC006: Xem tien phat
-    // - E2E_TC007: Dong tien phat
+    // - E2E_TC006 (Person B): Dang ky thanh vien moi - navigate /members/new, fill #fullName, #phone, #email, click #submitBtn
+    // - E2E_TC007 (Person C): Muon sach - navigate /borrow, chon member + book tu dropdown, click nut Muon
+    // - E2E_TC008 (Person C): Tra sach - navigate /borrow, click nut Tra Sach tren dong dang muon
+    // - E2E_TC009 (Person D): Xem tien phat - navigate /fines, kiem tra hien thi danh sach
+    // - E2E_TC010 (Person D): Dong tien phat - navigate /fines, click nut Dong Phat
 }
