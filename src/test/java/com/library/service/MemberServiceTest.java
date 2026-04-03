@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -127,7 +129,7 @@ class MemberServiceTest {
     @DisplayName("TC008 - Vô hiệu hóa thành viên")
     void testDeactivateMember() {
         when(memberRepository.findById(1L)).thenReturn(Optional.of(testMember));
-        doNothing().when(memberRepository).save(any(Member.class));
+        when(memberRepository.save(any(Member.class))).thenReturn(testMember);
 
         memberService.deactivateMember(1L);
 
@@ -139,7 +141,7 @@ class MemberServiceTest {
     void testReactivateMember() {
         testMember.setActive(false);
         when(memberRepository.findById(1L)).thenReturn(Optional.of(testMember));
-        doNothing().when(memberRepository).save(any(Member.class));
+        when(memberRepository.save(any(Member.class))).thenReturn(testMember);
 
         memberService.reactivateMember(1L);
 
