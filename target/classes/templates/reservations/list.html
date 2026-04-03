@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Danh sách đặt sách - Thư viện</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px 0;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .status-active {
+            color: green;
+            font-weight: bold;
+        }
+        .status-cancelled {
+            color: red;
+            text-decoration: line-through;
+        }
+        .message {
+            padding: 10px;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .error {
+            padding: 10px;
+            background-color: #f8d7da;
+            color: #721c24;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📋 Danh sách đặt sách</h1>
+    
+    <div th:if="${message}" class="message" th:text="${message}"></div>
+    <div th:if="${error}" class="error" th:text="${error}"></div>
+    
+    <a href="/reservations/add" class="btn">➕ Đặt sách mới</a>
+    <a href="/" class="btn" style="background-color: #6c757d;">🏠 Về trang chủ</a>
+    
+    <table th:if="${not #lists.isEmpty(reservations)}">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Thành viên</th>
+            <th>Sách</th>
+            <th>Ngày đặt</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="reservation : ${reservations}">
+            <td th:text="${reservation.id}"></td>
+            <td th:text="${reservation.member.fullName}"></td>
+            <td th:text="${reservation.book.title}"></td>
+            <td th:text="${#temporals.format(reservation.reservationDate, 'dd/MM/yyyy')}"></td>
+            <td>
+                <span th:if="${reservation.status == 'ACTIVE'}" class="status-active">✅ Đang chờ</span>
+                <span th:if="${reservation.status == 'FULFILLED'}" class="status-fulfilled">✓ Hoàn thành</span>
+                <span th:if="${reservation.status == 'CANCELLED'}" class="status-cancelled">✗ Đã hủy</span>
+            </td>
+            <td>
+                <a th:href="@{/reservations/{id}(id=${reservation.id})}" class="btn" style="background-color: #17a2b8; padding: 5px 10px;">Xem</a>
+                <th:block th:if="${reservation.status == 'ACTIVE'}">
+                    <a th:href="@{/reservations/cancel/{id}(id=${reservation.id})}" class="btn btn-danger" style="padding: 5px 10px;">Hủy</a>
+                </th:block>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    
+    <div th:if="${#lists.isEmpty(reservations)}" style="text-align: center; padding: 20px; color: #666;">
+        <p>Không có dữ liệu đặt sách</p>
+    </div>
+</div>
+</body>
+</html>
