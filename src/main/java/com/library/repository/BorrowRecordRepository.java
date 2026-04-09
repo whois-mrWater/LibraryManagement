@@ -1,5 +1,6 @@
 package com.library.repository;
 
+import com.library.model.Book;
 import com.library.model.BorrowRecord;
 import com.library.model.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,8 @@ import java.util.List;
 public interface BorrowRecordRepository extends JpaRepository<BorrowRecord, Long> {
     // TODO (Thanh vien C): Them cac ham tim kiem o day
     List<BorrowRecord> findByMember(Member member);
+
     List<BorrowRecord> findByStatus(String status);
+
+    long countByBookAndStatusIn(Book book, List<String> statuses);
 }

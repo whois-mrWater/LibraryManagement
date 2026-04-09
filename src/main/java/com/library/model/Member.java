@@ -20,7 +20,7 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, length = 10)
+    @Column(unique = true, length = 20)
     private String memberCode;    // Mã thành viên (M001, M002, ...)
     
     @Column(nullable = false)

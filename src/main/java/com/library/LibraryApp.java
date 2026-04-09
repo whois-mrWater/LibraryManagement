@@ -11,6 +11,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class LibraryApp {
     public static void main(String[] args) {
         SpringApplication.run(LibraryApp.class, args);
-        System.out.println("=== Thu Vien Dang Chay tai: http://localhost:8080 ===");
+        System.out.println("=== Thư viện đang chạy tại đây: http://localhost:8080 ===");
     }
 }

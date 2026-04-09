@@ -3,6 +3,7 @@ package com.library.service;
 import com.library.model.Member;
 import com.library.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.library.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
@@ -18,6 +19,8 @@ public class MemberService {
 
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     /** Lấy danh sách tất cả thành viên */
     public List<Member> getAllMembers() {
@@ -36,27 +39,27 @@ public class MemberService {
         if (member == null) {
             throw new IllegalArgumentException("Thông tin thành viên không được null");
         }
-        
+
         if (member.getFullName() == null || member.getFullName().trim().isEmpty()) {
             throw new IllegalArgumentException("Họ tên không được trống");
         }
-        
+
         if (member.getPhone() == null || member.getPhone().trim().isEmpty()) {
             throw new IllegalArgumentException("Số điện thoại không được trống");
         }
-        
+
         // Kiểm tra số điện thoại đã tồn tại
         Optional<Member> existingMember = memberRepository.findByPhone(member.getPhone());
         if (existingMember.isPresent()) {
             throw new IllegalArgumentException("Số điện thoại đã được đăng ký");
         }
-        
+
         // Tự động sinh mã thẺ dựa trên UUID
-        String memberCode = "MEM-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        String memberCode = "M-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         member.setMemberCode(memberCode);
         member.setJoinDate(LocalDate.now());
         member.setActive(true);
-        
+
         return memberRepository.save(member);
     }
 
@@ -68,20 +71,20 @@ public class MemberService {
         if (phone == null || phone.trim().isEmpty()) {
             throw new IllegalArgumentException("Số điện thoại không được trống");
         }
-        
+
         Optional<Member> member = memberRepository.findByPhone(phone);
         if (!member.isPresent()) {
             throw new IllegalArgumentException("Số điện thoại không tản tại");
         }
-        
+
         Member foundMember = member.get();
         if (!foundMember.isActive()) {
             throw new IllegalArgumentException("Tài khoản đã bị khóa");
         }
-        
+
         // TODO: Kiểm tra mật khẩu sử dụng BCrypt khi có
         // Nên sử dụng Spring Security và BCryptPasswordEncoder
-        
+
         return foundMember;
     }
 
@@ -92,22 +95,22 @@ public class MemberService {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID thành viên không hợp lệ");
         }
-        
+
         Optional<Member> existingMember = memberRepository.findById(id);
         if (!existingMember.isPresent()) {
             throw new IllegalArgumentException("Thành viên không tìm thấy");
         }
-        
+
         Member member = existingMember.get();
-        
+
         if (updatedMember.getFullName() != null && !updatedMember.getFullName().trim().isEmpty()) {
             member.setFullName(updatedMember.getFullName());
         }
-        
+
         if (updatedMember.getEmail() != null && !updatedMember.getEmail().trim().isEmpty()) {
             member.setEmail(updatedMember.getEmail());
         }
-        
+
         return memberRepository.save(member);
     }
 
@@ -118,12 +121,12 @@ public class MemberService {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID thành viên không hợp lệ");
         }
-        
+
         Optional<Member> member = memberRepository.findById(id);
         if (!member.isPresent()) {
             throw new IllegalArgumentException("Thành viên không tìm thấy");
         }
-        
+
         Member foundMember = member.get();
         foundMember.setActive(!foundMember.isActive());
         return memberRepository.save(foundMember);
@@ -136,7 +139,7 @@ public class MemberService {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID thành viên không hợp lệ");
         }
-        
+
         Optional<Member> member = memberRepository.findById(id);
         if (member.isPresent()) {
             Member foundMember = member.get();
@@ -152,7 +155,7 @@ public class MemberService {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID thành viên không hợp lệ");
         }
-        
+
         Optional<Member> member = memberRepository.findById(id);
         if (member.isPresent()) {
             Member foundMember = member.get();
@@ -204,4 +207,29 @@ public class MemberService {
         Optional<Member> member = memberRepository.findById(id);
         return member.orElse(null);
     }
+
+    // * Xóa thành viên (nên dùng deactivate thay vì xóa thật để giữ lịch sử mượn
+    // trả) */
+    public void deleteMember(Long id) {
+        // Xóa user trước (tránh lỗi foreign key)
+        memberRepository.findById(id).ifPresent(member -> {
+            userRepository.findByUsername(member.getPhone())
+                    .ifPresent(userRepository::delete);
+            memberRepository.delete(member);
+        });
+    }
+
+    public Member findById(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy thành viên"));
+    }
+
+    public void updateMember1(Long id, Member updated) {
+        Member member = findById(id);
+        member.setFullName(updated.getFullName());
+        member.setPhone(updated.getPhone());
+        member.setEmail(updated.getEmail());
+        memberRepository.save(member);
+    }
+
 }

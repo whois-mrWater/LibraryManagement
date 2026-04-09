@@ -24,7 +24,7 @@ public class BorrowService {
     @Autowired
     private FineService fineService;
 
-    public static final int MAX_BORROW_DAYS = 14;    // Mượn tối đa 14 ngày
+    public static final int MAX_BORROW_DAYS = 14; // Mượn tối đa 14 ngày
     public static final int MAX_BOOKS_PER_MEMBER = 5; // Mỗi người mượn tối đa 5 quyển
 
     /**
@@ -37,8 +37,8 @@ public class BorrowService {
     public BorrowRecord borrowBook(Long memberId, Long bookId) {
         // Rule 1: Kiểm tra thanh viên hoạt động
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new RuntimeException("Member not found with id: " + memberId));
-        
+                .orElseThrow(() -> new RuntimeException("Member not found with id: " + memberId));
+
         if (!member.isActive()) {
             throw new RuntimeException("Member is not active");
         }
@@ -52,17 +52,17 @@ public class BorrowService {
 
         // Rule 2: Kiểm tra sách có sẵn
         Book book = bookRepository.findById(bookId)
-            .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
-        
+                .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
+
         if (book.getAvailableCopies() <= 0) {
             throw new RuntimeException("Book is not available");
         }
 
         // Rule 3: Kiểm tra số lượng sách đang mượn
         List<BorrowRecord> activeBorrows = borrowRecordRepository.findAll().stream()
-            .filter(br -> br.getMember().getId().equals(memberId) && "BORROWED".equals(br.getStatus()))
-            .collect(Collectors.toList());
-        
+                .filter(br -> br.getMember().getId().equals(memberId) && "BORROWED".equals(br.getStatus()))
+                .collect(Collectors.toList());
+
         if (activeBorrows.size() >= MAX_BOOKS_PER_MEMBER) {
             throw new RuntimeException("Member has reached maximum borrow limit of " + MAX_BOOKS_PER_MEMBER);
         }
@@ -91,7 +91,7 @@ public class BorrowService {
      */
     public BorrowRecord returnBook(Long borrowRecordId) {
         BorrowRecord borrowRecord = borrowRecordRepository.findById(borrowRecordId)
-            .orElseThrow(() -> new RuntimeException("BorrowRecord not found with id: " + borrowRecordId));
+                .orElseThrow(() -> new RuntimeException("BorrowRecord not found with id: " + borrowRecordId));
 
         if (!"BORROWED".equals(borrowRecord.getStatus())) {
             throw new RuntimeException("Cannot return book that is not borrowed");
@@ -122,8 +122,8 @@ public class BorrowService {
      */
     public List<BorrowRecord> getBorrowHistory(Long memberId) {
         return borrowRecordRepository.findAll().stream()
-            .filter(br -> br.getMember().getId().equals(memberId))
-            .collect(Collectors.toList());
+                .filter(br -> br.getMember().getId().equals(memberId))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -133,9 +133,9 @@ public class BorrowService {
     public List<BorrowRecord> getOverdueBooks() {
         LocalDate today = LocalDate.now();
         return borrowRecordRepository.findAll().stream()
-            .filter(br -> br.getDueDate().isBefore(today) && 
-                          ("BORROWED".equals(br.getStatus()) || "OVERDUE".equals(br.getStatus())))
-            .collect(Collectors.toList());
+                .filter(br -> br.getDueDate().isBefore(today) &&
+                        ("BORROWED".equals(br.getStatus()) || "OVERDUE".equals(br.getStatus())))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -143,8 +143,8 @@ public class BorrowService {
      */
     public List<BorrowRecord> getActiveBorrowsByMember(Long memberId) {
         return borrowRecordRepository.findAll().stream()
-            .filter(br -> br.getMember().getId().equals(memberId) && "BORROWED".equals(br.getStatus()))
-            .collect(Collectors.toList());
+                .filter(br -> br.getMember().getId().equals(memberId) && "BORROWED".equals(br.getStatus()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -152,7 +152,7 @@ public class BorrowService {
      */
     public BorrowRecord getBorrowById(Long borrowRecordId) {
         return borrowRecordRepository.findById(borrowRecordId)
-            .orElseThrow(() -> new RuntimeException("BorrowRecord not found"));
+                .orElseThrow(() -> new RuntimeException("BorrowRecord not found"));
     }
 
     /**
