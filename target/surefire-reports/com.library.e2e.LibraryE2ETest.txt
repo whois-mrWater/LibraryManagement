@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.library.e2e.LibraryE2ETest
--------------------------------------------------------------------------------
-Tests run: 15, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 59.90 s -- in com.library.e2e.LibraryE2ETest
